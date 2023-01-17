@@ -1,1 +1,1 @@
-Get-AzProviderOperation | ConvertTo-Csv > test.csv
+Get-AzProviderOperation | ConvertTo-Csv > resourceActions.csv
