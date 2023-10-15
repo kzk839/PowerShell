@@ -383,7 +383,7 @@ $emailAddress = [Microsoft.VisualBasic.Interaction]::InputBox("ユーザーの�
 $isAdditionalEmailNeeded = [System.Windows.Forms.MessageBox]::Show("追加のメールアドレスが必要？", "追加メールアドレスの確認", "YesNo", "Question", "Button2")
 if ($isAdditionalEmailNeeded -eq "Yes") {
     # Input Additional Email Address
-    $additionalEmailAddress = [Microsoft.VisualBasic.Interaction]::InputBox("追加のメールアドレスをコロン ( : ) 区切りで入力", "追加メールアドレスの入力")
+    $additionalEmailAddress = [Microsoft.VisualBasic.Interaction]::InputBox("追加のメールアドレスをセミコロン ( : ) 区切りで入力", "追加メールアドレスの入力")
 }
 
 # Select Severity
