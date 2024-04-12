@@ -188,11 +188,9 @@ if ($showResult) {
 
 #Export Csv
 if ($exportCsv) {
-	#Get Current Directory
-	$currentPath = (Get-Location).Path
-
 	#Export Result to CSV
-	Write-Host "Export Csv to ${currentPath}\Diff2MonthAzureCost.csv`n"
+	Write-Host "Export Csv to ${PSScriptRoot}\Diff2MonthAzureCost.csv`n"
+
 	#Round Off Cost and Diff to the fifth decimal place
 	$roundResult = @()
 	$roundResult += $result | ForEach-Object {
@@ -201,9 +199,10 @@ if ($exportCsv) {
 		$_."Diff (${m2YM} - ${m1YM})" = [Math]::Round($_."Diff (${m2YM} - ${m1YM})", 4)
 		$_
 	}
+	
 	#Export Csv
 	$roundResult | Select-Object -Property $groupingBy, "Cost : ${m2YM}", "Cost : ${m1YM}", "Diff (${m2YM} - ${m1YM})", Currency `
-	| Sort-Object -Property "Diff (${m2YM} - ${m1YM})" -Descending | Export-Csv -Path "${currentPath}\Diff2MonthAzureCost.csv" -NoTypeInformation -Encoding UTF8
+	| Sort-Object -Property "Diff (${m2YM} - ${m1YM})" -Descending | Export-Csv -Path "${PSScriptRoot}\Diff2MonthAzureCost.csv" -NoTypeInformation -Encoding UTF8
 }
 
 Write-Host "End Script"
