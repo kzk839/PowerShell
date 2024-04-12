@@ -130,7 +130,7 @@ function addM2DataToResult ($m2Data, $resultData) {
 	}
 
 	if ($groupingBy -eq "resourceGroupName") {
-		#if groupingBy is resourceGroupName, change Non-ResourceGroup Cost Name
+		#if groupingBy is resourceGroupName, change Name to Non-ResourceGroup Cost Name
 		($resultData | Where-Object -Property ResourceGroupName -eq "").$groupingBy = "Non-ResourceGroup Cost"
 	}
 
