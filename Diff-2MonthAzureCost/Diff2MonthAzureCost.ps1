@@ -1,4 +1,4 @@
-#---- define variables ----
+﻿#---- define variables ----
 $apiVersion = "2023-11-01"
 $fromDateTime = "T00:00:00+00:00"
 $toDateTime = "T23:59:59+00:00"

@@ -1,4 +1,4 @@
-# function for Select Contact Method
+﻿# function for Select Contact Method
 function selectContactMethod {
     # Create Form
     $contactMethodForm = New-Object System.Windows.Forms.Form

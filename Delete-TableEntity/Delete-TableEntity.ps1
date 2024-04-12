@@ -1,4 +1,4 @@
-param (
+﻿param (
     # リソース グループ名
     [Parameter(Mandatory = $true)]
     [String]
