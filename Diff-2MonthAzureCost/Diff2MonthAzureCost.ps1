@@ -58,9 +58,9 @@ function getMonthData ([int]$num, $monthYM) {
 	return $monthData
 }
 
-#Add m1 Data To Result
-function addm1DataToResult ($m1Data, $resultData) {
-	Write-Host "Add m1 Data To Result..."
+#Add M1 Data To Result
+function addM1DataToResult ($m1Data, $m1DiffedData) {
+	Write-Host "Add M1 Data To Result..."
 
 	$m1Data | ForEach-Object {
 		#Object Properties
@@ -69,19 +69,19 @@ function addm1DataToResult ($m1Data, $resultData) {
 		# $_[2] : resourceGroup (may "", not $null) or resourceId
 		# $_[3] : currency
 
-		#Get m1 ResourceGroup Name, Cost, Currency
+		#Get M1 ResourceGroup Name, Cost, Currency
 		$m1Cost = $_[0]
 		$m1Id = $_[2]
 		$m1Currency = $_[3]
 
-		if ($resultData | Where-Object -Property $groupingBy -eq $m1Id) {
-			# if $m1Id is already in $diffedData, add m1 Cost to $diffedData and calculate diff
-			($resultData | Where-Object -Property $groupingBy -eq $m1Id)."Cost : ${m1YM}" += $m1Cost
-			($resultData | Where-Object -Property $groupingBy -eq $m1Id)."Diff (${m1YM} - ${m2YM})" += $m1Cost
+		if ($m1DiffedData | Where-Object -Property $groupingBy -eq $m1Id) {
+			#if $m1Id is already in $m1DiffedData, add M1 Cost to $m1DiffedData and calculate diff
+			($m1DiffedData | Where-Object -Property $groupingBy -eq $m1Id)."Cost : ${m1YM}" += $m1Cost
+			($m1DiffedData | Where-Object -Property $groupingBy -eq $m1Id)."Diff (${m1YM} - ${m2YM})" += $m1Cost
 		}
-		elseif ($null -eq ($resultData | Where-Object -Property $groupingBy -eq $m1Id)) {
-			# if $m1Id is not in $diffedData, add m1 Cost to $diffedData
-			$resultData += New-Object PSObject -Property @{
+		else {
+			#if $m1Id is not in $m1DiffedData, add New Object to $m1DiffedData
+			$m1DiffedData += New-Object PSObject -Property @{
 				$groupingBy                = $m1Id
 				"Cost : ${m1YM}"           = $m1Cost
 				"Cost : ${m2YM}"           = 0
@@ -93,12 +93,12 @@ function addm1DataToResult ($m1Data, $resultData) {
 
 	Write-Host "Complete`n"
 
-	return $resultData
+	return $m1DiffedData
 }
 
-#Add m2 Data To Result
-function addm2DataToResult ($m2Data, $m2DiffedData) {
-	Write-Host "Add m2 Data To Result..."
+#Add M2 Data To Result
+function addM2DataToResult ($m2Data, $resultData) {
+	Write-Host "Add M2 Data To Result..."
 
 	$m2Data | ForEach-Object {
 		#Object Properties
@@ -107,19 +107,19 @@ function addm2DataToResult ($m2Data, $m2DiffedData) {
 		# $_[2] : resourceGroup (may "", not $null) or resourceId
 		# $_[3] : currency
 
-		#Get m2 ResourceGroup Name, Cost, Currency
+		#Get M2 ResourceGroup Name, Cost, Currency
 		$m2Cost = $_[0]
 		$m2Id = $_[2]
 		$m2Currency = $_[3]
 
-		if ($m2DiffedData | Where-Object -Property $groupingBy -eq $m2Id) {
-			#if $m2Id is already in $diffedData, add m2 Cost to $m2diffedData
-			($m2DiffedData | Where-Object -Property $groupingBy -eq $m2Id)."Cost : ${m2YM}" += $m2Cost
-			($m2DiffedData | Where-Object -Property $groupingBy -eq $m2Id)."Diff (${m1YM} - ${m2YM})" -= $m2Cost
+		if ($resultData | Where-Object -Property $groupingBy -eq $m2Id) {
+			#if $m2Id is already in $resultData, add M2 Cost to $resultData
+			($resultData | Where-Object -Property $groupingBy -eq $m2Id)."Cost : ${m2YM}" += $m2Cost
+			($resultData | Where-Object -Property $groupingBy -eq $m2Id)."Diff (${m1YM} - ${m2YM})" -= $m2Cost
 		}
-		else {
-			#if $m2Id is not in $diffedData, add m2 Cost to $m2diffedData as new object
-			$m2DiffedData += New-Object PSObject -Property @{
+		elseif ($null -eq ($resultData | Where-Object -Property $groupingBy -eq $m2Id)) {
+			#if $m2Id is not in $resultData, add New Object to $resultData
+			$resultData += New-Object PSObject -Property @{
 				$groupingBy                = $m2Id
 				"Cost : ${m1YM}"           = 0
 				"Cost : ${m2YM}"           = $m2Cost
@@ -131,12 +131,12 @@ function addm2DataToResult ($m2Data, $m2DiffedData) {
 
 	if ($groupingBy -eq "resourceGroupName") {
 		#if groupingBy is resourceGroupName, change Non-ResourceGroup Cost Name
-		($m2DiffedData | Where-Object -Property ResourceGroupName -eq "").$groupingBy = "Non-ResourceGroup Cost"
+		($resultData | Where-Object -Property ResourceGroupName -eq "").$groupingBy = "Non-ResourceGroup Cost"
 	}
 
 	Write-Host "Complete`n"
 
-	return $m2DiffedData
+	return $resultData
 }
 
 # ---- main ----
@@ -159,11 +159,11 @@ Set-AzContext -SubscriptionId $subscriptionId | Out-Null
 #Set Cost Management Uri
 $uri = "/subscriptions/${subscriptionId}/providers/Microsoft.CostManagement/query?api-version=${apiVersion}"
 
-# Get month1 Data : two-dimensional array
+# Get Month1 Data : two-dimensional array
 $m1YM = [Microsoft.VisualBasic.Interaction]::InputBox( "比較対象となる年月 (M1) をスラッシュ区切りで指定`r`n例 : 2024/1`r`n出力結果は M1 - M2 で算出`r`n", "比較対象となる年月の指定")
 
-# Get month2 Data : two-dimensional array
-$m2YM = [Microsoft.VisualBasic.Interaction]::InputBox( "比較元となる年月 (M2) をスラッシュ区切りで指定`r`n例 : 2023/12`r`n出力結果は M1 - M2 で算出`r`n`r`nM1 の指定 : ${m1YM}", "比較元となる月の指定")
+# Get Month2 Data : two-dimensional array
+$m2YM = [Microsoft.VisualBasic.Interaction]::InputBox( "比較元となる年月 (M2) をスラッシュ区切りで指定`r`n例 : 2024/2`r`n出力結果は M1 - M2 で算出`r`n`r`nM1 の指定 : ${m1YM}", "比較元となる月の指定")
 
 #Get Month Data
 $month1Data = getMonthData 1 $m1YM
@@ -172,11 +172,11 @@ $month2Data = getMonthData 2 $m2YM
 #Define Result Data
 $diffedData = @()
 
-#Add m2 Data To Result
-$m1Result = addm1DataToResult $month1Data $diffedData
+#Add M2 Data To Result
+$m1Result = addM1DataToResult $month1Data $diffedData
 
-#Add m1 Data To Result and Calculate Diff
-$result = addm2DataToResult $month2Data $m1Result
+#Add M1 Data To Result and Calculate Diff
+$result = addM2DataToResult $month2Data $m1Result
 
 #Show Result
 if ($showResult) {
