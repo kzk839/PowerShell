@@ -31,6 +31,8 @@ $payloadTemplate = @{
 		)
 	}
 } | ConvertTo-Json -Depth 3
+#Error Handling
+$ErrorActionPreference = "Stop"
 
 #---- functions ----
 function getMonthData ([int]$num, $monthYM) {
