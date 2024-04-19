@@ -195,9 +195,9 @@ if ($exportCsv) {
 	#Round Off Cost and Diff to the fifth decimal place
 	$roundResult = @()
 	$roundResult += $result | ForEach-Object {
-		$_."Cost : ${m1YM}" = [Math]::Round($_."Cost : ${m1YM}", 4)
-		$_."Cost : ${m2YM}" = [Math]::Round($_."Cost : ${m2YM}", 4)
-		$_."Diff (${m1YM} - ${m2YM})" = [Math]::Round($_."Diff (${m1YM} - ${m2YM})", 4)
+		$_."Cost : ${m1YM}" = [Math]::Round($_."Cost : ${m1YM}", 4,[MidpointRounding]::AwayFromZero)
+		$_."Cost : ${m2YM}" = [Math]::Round($_."Cost : ${m2YM}", 4,[MidpointRounding]::AwayFromZero)
+		$_."Diff (${m1YM} - ${m2YM})" = [Math]::Round($_."Diff (${m1YM} - ${m2YM})", 4,[MidpointRounding]::AwayFromZero)
 		$_
 	}
 
