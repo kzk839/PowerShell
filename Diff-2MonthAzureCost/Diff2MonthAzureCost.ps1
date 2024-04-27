@@ -6,7 +6,7 @@ $toDateTime = "T23:59:59+00:00"
 $groupingBy = "resourceGroupName"
 # Show Result : $true or $false
 $showResult = $false
-# Export Csv : $true or $falseS
+# Export Csv : $true or $false
 $exportCsv = $true
 $payloadTemplate = @{
 	type       = "Usage"
